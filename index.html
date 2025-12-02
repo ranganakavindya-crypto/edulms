@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProEdu LMS - Professional Learning Management System</title>
+    <style>
+        /* Reset & Base */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f0f4f8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+         :root {
+            --blue-primary: #0ea5e9;
+            --blue-light: #38bdf8;
+            --blue-dark: #0284c7;
+            --bg-dark: #111827;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --shadow: 0 20px 40px rgba(14, 165, 233, 0.3);
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+        /* FIXED: Full page coverage - no background bleed */
+        
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: none;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .nav-main {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 1001;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue-primary), var(--blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            border: 2px solid var(--blue-primary);
+            background: transparent;
+            color: #fff;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover,
+        .nav-btn.primary {
+            background: linear-gradient(45deg, var(--blue-primary), var(--blue-dark));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.4);
+        }
+        
+        #role-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding-top: 70px;
+            background: radial-gradient(circle at center, var(--blue-primary)10%, transparent 70%);
+        }
+        
+        .role-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            width: 100%;
+            padding: 2rem;
+        }
+        
+        .role-card {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            text-align: center;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            flex: 1;
+            min-width: 300px;
+            max-width: 350px;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow);
+            border-color: var(--blue-primary);
+        }
+        
+        .role-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .role-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--blue-light);
+        }
+        
+        .role-desc {
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .login-container {
+            padding-top: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .login-card {
+            background: var(--card-bg);
+            padding: 3.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        
+        .login-header h1 {
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--blue-primary), var(--blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .login-header p {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--blue-light);
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.7rem;
+            color: var(--blue-primary);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1.2rem 1.4rem;
+            border: 2px solid rgba(14, 165, 233, 0.3);
+            border-radius: 16px;
+            background: var(--input-bg);
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        /* FIXED Select dropdown visibility */
+        
+        .form-group select {
+            background: rgba(255, 255, 255, 0.12) !important;
+            color: #fff !important;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5rem;
+            padding-right: 3rem;
+        }
+        
+        .form-group select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--blue-primary);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1.3rem;
+            background: linear-gradient(45deg, var(--blue-primary), var(--blue-dark));
+            border: none;
+            border-radius: 16px;
+            color: #000;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.4);
+        }
+        
+        .demo-creds {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 12px;
+            font-size: 0.95rem;
+        }
+        /* Dashboard Styles */
+        
+        .dashboard-container {
+            padding-top: 120px;
+            padding: 0 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        
+        .dashboard-title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(45deg, var(--blue-primary), var(--blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .welcome-text {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .dashboard-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            color: var(--blue-light);
+            margin-bottom: 2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--blue-primary);
+        }
+        /* CRUD Buttons */
+        
+        .crud-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin: 0.2rem;
+        }
+        
+        .btn-add {
+            background: linear-gradient(45deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(45deg, var(--blue-primary), var(--blue-light));
+            color: white;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .btn-search {
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scrollable {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 12px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        
+        .list-item {
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .list-item strong {
+            color: var(--blue-light);
+        }
+        
+        .list-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .user-table th,
+        .user-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-table th {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--blue-light);
+            font-weight: 600;
+        }
+        
+        .user-table tr:hover {
+            background: rgba(14, 165, 233, 0.08);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-card {
+                padding: 2rem;
+            }
+            .dashboard-title {
+                font-size: 2.5rem;
+            }
+            .crud-buttons {
+                flex-direction: column;
+            }
+            .search-input {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Role Selector -->
+    <div id="role-selector" class="page active">
+        <div class="role-container">
+            <div class="role-card" onclick="showPage('student-login')">
+                <div class="role-icon">👨‍🎓</div>
+                <h2 class="role-title">Student Portal</h2>
+                <p class="role-desc">Access courses, track progress, view grades</p>
+            </div>
+            <div class="role-card" onclick="showPage('teacher-login')">
+                <div class="role-icon">👨‍🏫</div>
+                <h2 class="role-title">Teacher Portal</h2>
+                <p class="role-desc">Full CRUD: Add/Edit/Delete/Search lessons</p>
+            </div>
+            <div class="role-card" onclick="showPage('admin-login')">
+                <div class="role-icon">⚙️</div>
+                <h2 class="role-title">Admin Portal</h2>
+                <p class="role-desc">Complete user management & system control</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Pages -->
+    <div id="student-login" class="page">
+        <nav class="nav-main">
+            <div class="logo">ProEdu LMS</div>
+            <div class="nav-links"><a href="#" class="nav-btn" onclick="showPage('role-selector')">← Back</a></div>
+        </nav>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Student Login</h1>
+                    <p>Welcome back! Access your learning journey</p>
+                </div>
+                <form id="student-login-form">
+                    <div class="form-group"><label>Email</label><input type="email" placeholder="student@edu.com" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="123456" required></div>
+                    <button type="submit" class="login-btn">Enter Dashboard</button>
+                </form>
+                <div class="demo-creds"><strong>Demo:</strong> student@edu.com / 123456</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="teacher-login" class="page">
+        <nav class="nav-main">
+            <div class="logo">ProEdu LMS</div>
+            <div class="nav-links"><a href="#" class="nav-btn" onclick="showPage('role-selector')">← Back</a></div>
+        </nav>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Teacher Login</h1>
+                    <p>Manage your classes and lessons</p>
+                </div>
+                <form id="teacher-login-form">
+                    <div class="form-group"><label>Email</label><input type="email" placeholder="teacher@edu.com" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="123456" required></div>
+                    <button type="submit" class="login-btn">Enter Dashboard</button>
+                </form>
+                <div class="demo-creds"><strong>Demo:</strong> teacher@edu.com / 123456</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-login" class="page">
+        <nav class="nav-main">
+            <div class="logo">ProEdu LMS</div>
+            <div class="nav-links"><a href="#" class="nav-btn" onclick="showPage('role-selector')">← Back</a></div>
+        </nav>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>🔐 Admin Portal</h1>
+                    <p>Complete system control & analytics</p>
+                </div>
+                <form id="admin-login-form">
+                    <div class="form-group"><label>Email</label><input type="email" placeholder="admin@edu.com" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="123456" required></div>
+                    <button type="submit" class="login-btn">Enter Admin Dashboard</button>
+                </form>
+                <div class="demo-creds"><strong>Demo:</strong> admin@edu.com / 123456</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="student-dashboard" class="page">
+        <nav class="nav-main">
+            <div class="logo">ProEdu LMS - Student Dashboard</div>
+            <div class="nav-links"><a href="#" class="nav-btn primary" onclick="logout()">Logout</a></div>
+        </nav>
+        <div class="dashboard-container">
+            <h1 class="dashboard-title">Student Dashboard</h1>
+            <p class="welcome-text" id="student-welcome">Welcome back!</p>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3 class="card-title">📚 My Courses</h3>
+                    <div id="student-courses" class="scrollable"></div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="card-title">📋 Upcoming Assignments</h3>
+                    <div id="student-assignments" class="scrollable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard - FULL CRUD -->
+    <div id="teacher-dashboard" class="page">
+        <nav class="nav-main">
+            <div class="logo">ProEdu LMS - Teacher Dashboard</div>
+            <div class="nav-links"><a href="#" class="nav-btn primary" onclick="logout()">Logout</a></div>
+        </nav>
+        <div class="dashboard-container">
+            <h1 class="dashboard-title">Teacher Dashboard</h1>
+            <p class="welcome-text" id="teacher-welcome">Welcome back!</p>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3 class="card-title">➕ Add New Lesson</h3>
+                    <form id="add-lesson-form">
+                        <div class="form-group"><label>Lesson Title</label><input type="text" id="lesson-title" placeholder="e.g. CSS Grid Layouts" required></div>
+                        <div class="form-group"><label>Description</label><textarea id="lesson-desc" rows="3" placeholder="Enter lesson details..." required></textarea></div>
+                        <button type="submit" class="login-btn">Add Lesson</button>
+                    </form>
+                </div>
+                <div class="dashboard-card">
+                    <div class="crud-buttons">
+                        <input type="text" id="lesson-search" class="search-input form-group" placeholder="🔍 Search lessons by title or description...">
+                        <button class="btn btn-search" onclick="searchLessons()">Search</button>
+                    </div>
+                    <h3 class="card-title">📖 My Lessons <span id="lessons-count">(0)</span></h3>
+                    <div id="teacher-lessons" class="scrollable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard - FULL CRUD -->
+    <div id="admin-dashboard" class="page">
+        <nav class="nav-main">
+            <div class="logo">ProEdu LMS - Admin Dashboard</div>
+            <div class="nav-links"><a href="#" class="nav-btn primary" onclick="logout()">Logout</a></div>
+        </nav>
+        <div class="dashboard-container">
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+            <p class="welcome-text" id="admin-welcome">Welcome back!</p>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3 class="card-title">➕ Add New User</h3>
+                    <form id="add-user-form">
+                        <div class="form-group"><label>Name</label><input type="text" id="user-name" placeholder="Full Name" required></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="user-email" placeholder="user@edu.com" required></div>
+                        <div class="form-group"><label>Role</label>
+                            <select id="user-role" required>
+                                <option value="">Select Role</option>
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="login-btn">Add User</button>
+                    </form>
+                </div>
+                <div class="dashboard-card">
+                    <div class="crud-buttons">
+                        <input type="text" id="user-search" class="search-input form-group" placeholder="🔍 Search users by name, email or role...">
+                        <button class="btn btn-search" onclick="searchUsers()">Search</button>
+                    </div>
+                    <h3 class="card-title">👥 All Users <span id="users-count">(0)</span></h3>
+                    <table class="user-table" id="admin-users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ✅ PERSISTENT DATA STORAGE WITH LOCALSTORAGE [web:144]
+        function loadData(key, defaultData) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultData;
+            } catch (e) {
+                console.error('Load error:', e);
+                return defaultData;
+            }
+        }
+
+        function saveData(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.error('Save error:', e);
+            }
+        }
+
+        // Initialize persistent data
+        let usersDB = loadData('usersDB', [{
+            id: 1,
+            name: "Sarah Johnson",
+            email: "student@edu.com",
+            role: "student",
+            password: "123456"
+        }, {
+            id: 2,
+            name: "David Wilson",
+            email: "teacher@edu.com",
+            role: "teacher",
+            password: "123456"
+        }, {
+            id: 3,
+            name: "Admin Superuser",
+            email: "admin@edu.com",
+            role: "admin",
+            password: "123456"
+        }]);
+        let lessonsDB = loadData('lessonsDB', []);
+        let coursesDB = loadData('coursesDB', [{
+            id: 1,
+            name: "Web Development",
+            progress: 75,
+            userEmail: "student@edu.com"
+        }, {
+            id: 2,
+            name: "Data Structures",
+            progress: 60,
+            userEmail: "student@edu.com"
+        }]);
+        let assignmentsDB = loadData('assignmentsDB', [{
+            id: 1,
+            title: "CSS Grid Project",
+            due: "2025-12-15",
+            userEmail: "student@edu.com"
+        }, {
+            id: 2,
+            title: "JavaScript Quiz",
+            due: "2025-12-10",
+            userEmail: "student@edu.com"
+        }]);
+
+        let currentUser = null;
+        let filteredUsers = [...usersDB];
+        let filteredLessons = [...lessonsDB];
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+            if (pageId.includes('dashboard')) updateDashboards();
+        }
+
+        function logout() {
+            currentUser = null;
+            showPage('role-selector');
+        }
+
+        // ✅ LOGIN HANDLERS
+        document.getElementById('student-login-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            const user = usersDB.find(u => u.email === email && u.role === 'student' && u.password === password);
+            if (user) {
+                currentUser = user;
+                document.getElementById('student-welcome').textContent = `Welcome back, ${user.name}! 👋`;
+                showPage('student-dashboard');
+            } else {
+                alert('Invalid credentials. Demo: student@edu.com / 123456');
+            }
+        });
+
+        document.getElementById('teacher-login-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            const user = usersDB.find(u => u.email === email && u.role === 'teacher' && u.password === password);
+            if (user) {
+                currentUser = user;
+                filteredLessons = lessonsDB.filter(l => l.teacher === user.email);
+                document.getElementById('teacher-welcome').textContent = `Welcome back, ${user.name}! 👨‍🏫`;
+                showPage('teacher-dashboard');
+            } else {
+                alert('Invalid credentials. Demo: teacher@edu.com / 123456');
+            }
+        });
+
+        document.getElementById('admin-login-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            const user = usersDB.find(u => u.email === email && u.role === 'admin' && u.password === password);
+            if (user) {
+                currentUser = user;
+                filteredUsers = [...usersDB];
+                document.getElementById('admin-welcome').textContent = `Welcome back, ${user.name}! ⚙️`;
+                showPage('admin-dashboard');
+            } else {
+                alert('Invalid credentials. Demo: admin@edu.com / 123456');
+            }
+        });
+
+        // ✅ TEACHER CRUD OPERATIONS
+        document.getElementById('add-lesson-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const title = document.getElementById('lesson-title').value;
+            const desc = document.getElementById('lesson-desc').value;
+            const newLesson = {
+                id: Date.now(),
+                title,
+                description: desc,
+                teacher: currentUser.email,
+                date: new Date().toLocaleDateString()
+            };
+            lessonsDB.push(newLesson);
+            saveData('lessonsDB', lessonsDB);
+            filteredLessons = lessonsDB.filter(l => l.teacher === currentUser.email);
+            e.target.reset();
+            updateDashboards();
+            alert('✅ Lesson added successfully!');
+        });
+
+        // ✅ ADMIN CRUD OPERATIONS
+        document.getElementById('add-user-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const role = document.getElementById('user-role').value;
+
+            if (usersDB.find(u => u.email === email)) {
+                alert('❌ User with this email already exists!');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                role,
+                password: "123456"
+            };
+            usersDB.push(newUser);
+            saveData('usersDB', usersDB);
+            filteredUsers = [...usersDB];
+            e.target.reset();
+            updateDashboards();
+            alert(`✅ ${role.toUpperCase()} user added! Default password: 123456`);
+        });
+
+        // ✅ SEARCH FUNCTIONS
+        function searchUsers() {
+            const query = document.getElementById('user-search').value.toLowerCase().trim();
+            filteredUsers = usersDB.filter(u =>
+                u.name.toLowerCase().includes(query) ||
+                u.email.toLowerCase().includes(query) ||
+                u.role.toLowerCase().includes(query)
+            );
+            updateDashboards();
+        }
+
+        function searchLessons() {
+            const query = document.getElementById('lesson-search').value.toLowerCase().trim();
+            filteredLessons = lessonsDB.filter(l =>
+                l.teacher === currentUser.email && (
+                    l.title.toLowerCase().includes(query) ||
+                    l.description.toLowerCase().includes(query)
+                )
+            );
+            updateDashboards();
+        }
+
+        // ✅ CRUD OPERATIONS
+        function editUser(id) {
+            const user = usersDB.find(u => u.id === id);
+            if (!user) return;
+
+            const newName = prompt('Edit Name:', user.name);
+            const newEmail = prompt('Edit Email:', user.email);
+            if (newName && newEmail && usersDB.find(u => u.email === newEmail && u.id !== id)) {
+                alert('❌ Email already exists!');
+                return;
+            }
+            if (newName && newEmail) {
+                user.name = newName;
+                user.email = newEmail;
+                saveData('usersDB', usersDB);
+                filteredUsers = [...usersDB];
+                updateDashboards();
+                alert('✅ User updated successfully!');
+            }
+        }
+
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                usersDB = usersDB.filter(u => u.id !== id);
+                saveData('usersDB', usersDB);
+                filteredUsers = [...usersDB];
+                updateDashboards();
+                alert('✅ User deleted successfully!');
+            }
+        }
+
+        function editLesson(id) {
+            const lesson = lessonsDB.find(l => l.id === id);
+            if (!lesson) return;
+
+            const newTitle = prompt('Edit Title:', lesson.title);
+            const newDesc = prompt('Edit Description:', lesson.description);
+            if (newTitle && newDesc) {
+                lesson.title = newTitle;
+                lesson.description = newDesc;
+                saveData('lessonsDB', lessonsDB);
+                filteredLessons = lessonsDB.filter(l => l.teacher === currentUser.email);
+                updateDashboards();
+                alert('✅ Lesson updated successfully!');
+            }
+        }
+
+        function deleteLesson(id) {
+            if (confirm('Are you sure you want to delete this lesson?')) {
+                lessonsDB = lessonsDB.filter(l => l.id !== id);
+                saveData('lessonsDB', lessonsDB);
+                filteredLessons = lessonsDB.filter(l => l.teacher === currentUser.email);
+                updateDashboards();
+                alert('✅ Lesson deleted successfully!');
+            }
+        }
+
+
+        function updateDashboards() {
+            // Student Dashboard
+            if (currentUser && currentUser.role === 'student') {
+                const coursesList = document.getElementById('student-courses');
+                const courses = coursesDB.filter(c => c.userEmail === currentUser.email);
+                coursesList.innerHTML = courses.length ?
+                    courses.map(c => `<div class="list-item"><strong>${c.name}</strong><span>${c.progress}% Complete</span></div>`).join('') :
+                    '<div class="list-item">No courses enrolled</div>';
+
+                const assignmentsList = document.getElementById('student-assignments');
+                const assignments = assignmentsDB.filter(a => a.userEmail === currentUser.email);
+                assignmentsList.innerHTML = assignments.length ?
+                    assignments.map(a => `<div class="list-item"><strong>${a.title}</strong><span>Due: ${a.due}</span></div>`).join('') :
+                    '<div class="list-item">No upcoming assignments</div>';
+            }
+
+            // Teacher Dashboard
+            if (currentUser && currentUser.role === 'teacher') {
+                const lessonsList = document.getElementById('teacher-lessons');
+                document.getElementById('lessons-count').textContent = `(${filteredLessons.length})`;
+                lessonsList.innerHTML = filteredLessons.length ? filteredLessons.map(l => `
+            <div class="list-item" data-id="${l.id}">
+                <div>
+                    <strong>${l.title}</strong><br>
+                    <small style="opacity: 0.7;">${l.date} • ${l.description.substring(0, 80)}${l.description.length > 80 ? '...' : ''}</small>
+                </div>
+                <div class="list-actions">
+                    <button class="btn btn-edit" onclick="editLesson(${l.id})">Edit</button>
+                    <button class="btn btn-delete" onclick="deleteLesson(${l.id})">Delete</button>
+                </div>
+            </div>
+        `).join('') : '<div class="list-item">No lessons found</div>';
+            }
+
+            // Admin Dashboard
+            if (currentUser && currentUser.role === 'admin') {
+                const tbody = document.querySelector('#admin-users-table tbody');
+                document.getElementById('users-count').textContent = `(${filteredUsers.length})`;
+                tbody.innerHTML = filteredUsers.map(user => `
+            <tr data-id="${user.id}">
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td><span style="color: var(--blue-primary); font-weight: 600;">${user.role}</span></td>
+                <td>
+                    <button class="btn btn-edit" onclick="editUser(${user.id})">Edit</button>
+                    <button class="btn btn-delete" onclick="deleteUser(${user.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
